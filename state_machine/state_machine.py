@@ -12,7 +12,7 @@ import numpy as np
 # Define global variables
 # TODO: Check that these zones are defined correctly
 # Red bin is zone 1, green bin is zone 2, blue bin is zone 3 and yellow bin is zone 4
-bin_dict = {"red":[150 -50 200], "green":[50 -150 200], "blue":[-50 -150 200], "yellow":[-150 -50 200]}
+bin_dict = {"red":[150, -50, 200], "green":[50, -150, 200], "blue":[-50, -150, 200], "yellow":[-150, -50, 200]}
 # Make a reasonable spot that won't hit the environment
 home_pose = Pose()
 
@@ -82,12 +82,13 @@ class StateMachineNode:
 # Class describing a cube object
 class TagCube:
 
-    def __init__(self):
-        # FIXME: Change passes lol
-        self.id = pass
-        self.colour = pass
-        self.position = pass
+    def __init__(self, msg):
+        # FIXME: Make sure this msg type is set up
+        self.id = msg.id
+        self.colour = msg.colour
+        self.position = msg.position
 
+    # TODO: Consider changing this to be position differences between two cubes and changing bin distance to something else
     # Overloading comparison functions to make sorting easier
     def __lt__(self, other):
         return self.get_bin_distance() < other.get_bin_distance()
