@@ -10,13 +10,15 @@ from geometry_msgs.msg import Pose
 import numpy as np
 
 # TODO: Make it so that the state machine will try to pick up blocks when the conveyor has stopped, also think about how 
-#       to make it so that it tries to pick up a block while its moving for Task 3b.
+#       to make it so that it tries to pick up a block while its moving for Task 3b. Maybe just always make the state machine
+#       try to grab a block while moving? Will probably need to predict where the cube will be in advance (calculate the 
+#       circular trajectory and wait above a spot until the cube reaches it).
 
 
 # TODO: Check that these zones are defined correctly
 # Red bin is zone 1, green bin is zone 2, blue bin is zone 3 and yellow bin is zone 4
 bin_dict = {"red":[150, -50, 200], "green":[50, -150, 200], "blue":[-50, -150, 200], "yellow":[-150, -50, 200]}
-# TODO: Make a reasonable spot that won't hit the environment
+# TODO: Make a reasonable spot that won't hit the environment, decide with team
 home_pose = Pose()
 
 
@@ -80,7 +82,7 @@ class StateMachineNode:
     # reachable cubes then return 'None'
     def pick_cube(self):
         self.cube_dict.sort()
-        for cube in cube_dict:
+        for cube in self.cube_dict:
             if not cube.is_obstructed():
                 return cube.position
         return None
@@ -131,15 +133,15 @@ class TagCube:
 
     # Determines wheter a particular block is obstructed by any other blocks around it
     def is_obstructed(self):
-        for cube in cube_dict:
-            # If two cubes' positions (mid points) are closer than 35 in the x direction (direction in line with the gripper) then consider them right next to each other 
-            if (self.position[0] - cube.position[0] <= 35):
-                return True
+        # TODO: Make sure the loop through the dictionary doesn't flag itself as it will always return True
+        for cube in self.cube_dict:
+            if (cube.id != self.id):
+            # If two cubes' positions (mid points) are closer than 40 in the x direction (direction in line with the gripper) then consider them right next to each other 
+                if (self.position[0] - cube.position[0] <= 40):
+                    return True
         # If the for loop gets all the way through without triggering True then the block is not obstructed by any other blocks around it
         return False
 
-
-        
 
 # Main robot loop
 def main():
@@ -147,46 +149,45 @@ def main():
     state_machine = StateMachineNode()
     
     while(True):
-        match state_machine.state:
-            case "waiting":
-                # If robot is in home position then publish the desired location to move
-                if(state_machine.current_end_effector == home_pose):
-                    # This line pops the first key value pair off the dictionary which corresponds to the one with minimised distance
-                    cube = state_machine.cube_dict.pop(list(state_machine.cube_dict)[0])
-                    
-                    # Form ROS msg for the desired pose
-                    desiredPoseMsg = Pose(header=Header(stamp=rospy.Time.now()))
-                    
-                    # Check to see this cube assignment works okay, cube should be [x y z]
-                    desiredPoseMsg.position = cube
-                    state_machine.posePub(desiredPoseMsg)
-                else:
-                    # If the robot is waiting but its not in its home config that means its gotten stuck somehow
-                    logging.warning("Robob stugg :(")
+        if state_machine.state == "waiting":
+            # If robot is in home position then publish the desired location to move
+            if(state_machine.current_end_effector == home_pose):
+                # This line pops the first key value pair off the dictionary which corresponds to the one with minimised distance
+                cube = state_machine.cube_dict.pop(list(state_machine.cube_dict)[0])
+                
+                # Form ROS msg for the desired pose
+                desiredPoseMsg = Pose(header=Header(stamp=rospy.Time.now()))
+                
+                # Check to see this cube assignment works okay, cube should be [x y z]
+                desiredPoseMsg.position = cube
+                state_machine.posePub(desiredPoseMsg)
+            else:
+                # If the robot is waiting but its not in its home config that means its gotten stuck somehow
+                logging.warning("Robob stugg :(")
 
-            case "grabbing":
-                if(state_machine.end_effector_arrived()):
-                    state_machine.close_gripper()
-                    state_machine.current_state = "dropping"
-                else:
-                    state_machine.current_state = "obstructed"
+        elif state_machine.state == "grabbing":
+            if(state_machine.end_effector_arrived()):
+                state_machine.close_gripper()
+                state_machine.current_state = "dropping"
+            else:
+                state_machine.current_state = "obstructed"
 
-            case "dropping":
-                if(state_machine.end_effector_arrived()):
-                    state_machine.open_gripper()
-                    state_machine.posePub(home_pose)
-                    state_machine.current_state = "waiting"
-                else:
-                    state_machine.current_state = "obstructed"
-        
-            case "obstructed":
+        elif state_machine.state == "dropping":
+            if(state_machine.end_effector_arrived()):
+                state_machine.open_gripper()
                 state_machine.posePub(home_pose)
                 state_machine.current_state = "waiting"
-            
-            case _:
-                print("Invalid state")
+            else:
+                state_machine.current_state = "obstructed"
+    
+        elif state_machine.state == "obstructed":
+            state_machine.posePub(home_pose)
+            state_machine.current_state = "waiting"
+        
+        else:
+            print("Invalid state")
 
-        rospy.sleep(5)
+        rospy.sleep(10)
     
 
 if __name__ == "__main__":
