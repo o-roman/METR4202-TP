@@ -9,11 +9,14 @@ from sensor_msgs.msg import JointState
 from geometry_msgs.msg import Pose
 import numpy as np
 
-# Define global variables
+# TODO: Make it so that the state machine will try to pick up blocks when the conveyor has stopped, also think about how 
+#       to make it so that it tries to pick up a block while its moving for Task 3b.
+
+
 # TODO: Check that these zones are defined correctly
 # Red bin is zone 1, green bin is zone 2, blue bin is zone 3 and yellow bin is zone 4
 bin_dict = {"red":[150, -50, 200], "green":[50, -150, 200], "blue":[-50, -150, 200], "yellow":[-150, -50, 200]}
-# Make a reasonable spot that won't hit the environment
+# TODO: Make a reasonable spot that won't hit the environment
 home_pose = Pose()
 
 
@@ -27,7 +30,6 @@ class StateMachineNode:
         self.current_state = "waiting"
         self.current_end_effector = Pose()
         self.cube_dict = {}
-               
 
         # Defining the constants required for an opened and closed gripper
         self.gripper_close , self.gripper_open = Float32()
@@ -65,6 +67,7 @@ class StateMachineNode:
 
 
     # Detects whether the end effector position is within the accepted tolerance of +-5% of the desired pose
+    # TODO: Decide if the +-5% is appropriate
     def end_effector_arrived(self, pose):
         
         if(self.current_end_effector < 1.05 * pose.position) and (self.current_end_effector > 0.95 * pose.position):
@@ -73,10 +76,15 @@ class StateMachineNode:
             return False
 
     
-    # Have part of the decision algorithm be a function that picks the minimum distance between a block and its respective bin
-    # TODO:Have the other portion of the algorithm decide whether a block can be picked up
+    # Function that picks the cube that is reachable and that is currently the closest to transport to a bin. If there are no
+    # reachable cubes then return 'None'
     def pick_cube(self):
         self.cube_dict.sort()
+        for cube in cube_dict:
+            if not cube.is_obstructed():
+                return cube.position
+        return None
+
 
 
 # Class describing a cube object
@@ -121,7 +129,16 @@ class TagCube:
     def get_bin_distance(self):
         return abs(self.get_position - bin_dict[self.get_colour()])
 
-    def is_beside
+    # Determines wheter a particular block is obstructed by any other blocks around it
+    def is_obstructed(self):
+        for cube in cube_dict:
+            # If two cubes' positions (mid points) are closer than 35 in the x direction (direction in line with the gripper) then consider them right next to each other 
+            if (self.position[0] - cube.position[0] <= 35):
+                return True
+        # If the for loop gets all the way through without triggering True then the block is not obstructed by any other blocks around it
+        return False
+
+
         
 
 # Main robot loop
