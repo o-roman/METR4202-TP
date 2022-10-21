@@ -2,12 +2,12 @@ import numpy as np
 
 
 
-def invers(x,y,z):
-    l0 = 9.5
-   # z = z_init-l0
-    l1 = 11.5
+def invers(x,y,z_init):
+    l0 = 10
+    z = z_init-l0
+    l1 = 11.75
     l2 = 9.5
-    l3 = 10
+    l3 = 11
     i =0
     j0_pi = np.arctan2(y,x)
     a = x/np.cos(j0_pi)
@@ -41,7 +41,7 @@ def invers(x,y,z):
             print("joint1:", theta1)
             print("joint2:", theta2)
             print("joint3:", theta3)
-            print(x1, y1, z1)
+            print(x1, y1, z1+l0)
             print()
             i = 1
 
@@ -72,7 +72,7 @@ def invers(x,y,z):
             print("joint1:", theta1)
             print("joint2:", theta2)
             print("joint3:", theta3)
-            print(x1, y1, z1)
+            print(x1, y1, z1+l0)
             print()
             i = 1
 
@@ -87,7 +87,7 @@ def invers(x,y,z):
         print("no answer")
 
 
-invers(1,1,1)
+invers(10,1,10)
 
 
 # joint4 in range from -pi/2 <= theta4 <= pi/2
