@@ -18,6 +18,18 @@ from geometry_msgs.msg import Pose
 import numpy as np
 
 def read_file():
+    fname = '/home/metr4202-team16/catkin_ws/src/metr4202_w7_prac/scripts/test2.txt'
+    with open(fname, 'r+', encoding='utf-8') as f:
+        s = [i[:-1].split(',') for i in f.readlines()]
+    transer_data = np.zeros(shape=(1701, 7))
+
+    for i in range(len(transer_data)):
+        for j in range(7):
+            transer_data[i][j] = float(s[i][j])
+    for i in range(len(transer_data)):
+        transer_data[i][0] = transer_data[i][0]-1.507       
+    return transer_data 
+def read_file_2():
     fname = '/home/metr4202-team16/catkin_ws/src/metr4202_w7_prac/scripts/test.txt'
     with open(fname, 'r+', encoding='utf-8') as f:
         s = [i[:-1].split(',') for i in f.readlines()]
@@ -26,10 +38,15 @@ def read_file():
     for i in range(len(transer_data)):
         for j in range(7):
             transer_data[i][j] = float(s[i][j])
+    for i in range(len(transer_data)-1):
+        transer_data[i][0] = transer_data[i][0]-1.507  
+
+
     #print(transer_data)
     return transer_data
 def searching_file(x,y,z):
-    joint_array = [1.5,0,0,0]
+    joint_array = [0,0,0,0]
+    flag =0
     x_int=int(x)
     x_float_part = x-x_int
     if x_float_part <0.25:
@@ -51,16 +68,32 @@ def searching_file(x,y,z):
     z_out = 1.5
     coordinate = [x_out,y_out,z_out]
     joint_coordi_info = read_file()
+    if x_out == 0 and y_out ==0 and z_out == 0:
+        joint_array=[0,0,0,0]
+        return joint_array
+
     for i in range(len(joint_coordi_info)):
-        for j in range(7):
+       
+        if joint_coordi_info[i][4] == x_out and joint_coordi_info[i][5] == y_out and joint_coordi_info[i][6] == z_out:
+            joint0 = joint_coordi_info[i][0]
+            joint1 = joint_coordi_info[i][1]
+            joint2 = joint_coordi_info[i][2]
+            joint3 = joint_coordi_info[i][3]
+            joint_array = [joint0,joint1,joint2,joint3]
+            flag = 1
+                #print(joint_coordi_info[i])
+    if flag ==0:
+        joint_coordi_info = read_file_2()
+        for i in range(len(joint_coordi_info)):
+           
             if joint_coordi_info[i][4] == x_out and joint_coordi_info[i][5] == y_out and joint_coordi_info[i][6] == z_out:
                 joint0 = joint_coordi_info[i][0]
                 joint1 = joint_coordi_info[i][1]
                 joint2 = joint_coordi_info[i][2]
                 joint3 = joint_coordi_info[i][3]
                 joint_array = [joint0,joint1,joint2,joint3]
-                #print(joint_coordi_info[i])
-    
+                flag = 1
+
     print(joint_array)
     print(coordinate)
     return joint_array
