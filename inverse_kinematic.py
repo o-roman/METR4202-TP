@@ -272,11 +272,10 @@ def searching_file(x,y,z):
                 joint1 = joint_coordi_info[i][1]
                 joint2 = joint_coordi_info[i][2]
                 joint3 = joint_coordi_info[i][3]
+                joint_array = [joint0,joint1,joint2,joint3]
+                #print(joint_coordi_info[i])
 
-    print(joint0)
-    print(joint1)
-    print(joint2)
-    print(joint3)
+    print(joint_array)
     print(coordinate)
     #x_new = int(x)
     #print(x_new)
