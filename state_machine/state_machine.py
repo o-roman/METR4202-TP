@@ -151,7 +151,7 @@ def main():
     while(True):
         if state_machine.state == "waiting":
             # If robot is in home position then publish the desired location to move
-            if(state_machine.current_end_effector == home_pose):
+            if(state_machine.current_end_effector == home_pose and t < 10):
                 # This line pops the first key value pair off the dictionary which corresponds to the one with minimised distance
                 cube = state_machine.cube_dict.pop(list(state_machine.cube_dict)[0])
                 
@@ -159,21 +159,34 @@ def main():
                 desiredPoseMsg = Pose(header=Header(stamp=rospy.Time.now()))
                 
                 # Check to see this cube assignment works okay, cube should be [x y z]
-                desiredPoseMsg.position = cube
+                desiredPoseMsg.position = cube.get_position()
                 state_machine.posePub(desiredPoseMsg)
             else:
                 # If the robot is waiting but its not in its home config that means its gotten stuck somehow
                 logging.warning("Robob stugg :(")
 
         elif state_machine.state == "grabbing":
-            if(state_machine.end_effector_arrived()):
+            # Add a check here for if its been past a certain time threshold to move the state to obstructed
+            if(state_machine.end_effector_arrived(desiredPoseMsg.position)):
                 state_machine.close_gripper()
-                state_machine.current_state = "dropping"
+                #TODO: Might need a way to check if the thing got obstructed
+                state_machine.posePub(home_pose)
+                if(state_machine.current_end_effector != home_pose and t > 10)
+                    state_machine.current_state = "obstructed"
+                else:
+                    # Form ROS msg for the desired pose
+                    desiredPoseMsg = Pose(header=Header(stamp=rospy.Time.now()))
+                    
+                    # Check to see this cube assignment works okay, cube should be [x y z]
+                    desiredPoseMsg.position = bin_dict[cube.get_colour()]
+                    state_machine.posePub(desiredPoseMsg)
+                    state_machine.current_state = "dropping"
+
             else:
                 state_machine.current_state = "obstructed"
 
         elif state_machine.state == "dropping":
-            if(state_machine.end_effector_arrived()):
+            if(state_machine.end_effector_arrived() and t < 10):
                 state_machine.open_gripper()
                 state_machine.posePub(home_pose)
                 state_machine.current_state = "waiting"
