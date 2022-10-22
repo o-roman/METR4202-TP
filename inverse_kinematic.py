@@ -232,12 +232,67 @@ def invers(x,y,z_init):
 
     if i==0:
         print("no answer")
+def read_file():
+    fname = 'test.txt'
+    with open(fname, 'r+', encoding='utf-8') as f:
+        s = [i[:-1].split(',') for i in f.readlines()]
+    transer_data = np.zeros(shape=(1793, 7))
+
+    for i in range(1793):
+        for j in range(7):
+            transer_data[i][j] = float(s[i][j])
+    #print(transer_data)
+    return transer_data
+def searching_file(x,y,z):
+    x_int=int(x)
+    x_float_part = x-x_int
+    if x_float_part <0.25:
+        x_out = x_int
+    if x_float_part>=0.25 and x_float_part<=0.75:
+        x_out = x_int+0.5
+    if x_float_part>0.75:
+        x_out = x_int +1
+
+    y_int = int(y)
+    y_float_part = y - y_int
+    if y_float_part < 0.25:
+        y_out = y_int
+    if y_float_part >= 0.25 and y_float_part <= 0.75:
+        y_out = y_int + 0.5
+    if x_float_part > 0.75:
+        y_out = y_int + 1
+
+    z_out = 1.5
+    coordinate = [x_out,y_out,z_out]
+    joint_coordi_info = read_file()
+    for i in range(len(joint_coordi_info)):
+        for j in range(7):
+            if joint_coordi_info[i][4] == x_out and joint_coordi_info[i][5] == y_out and joint_coordi_info[i][6] == z_out:
+                joint0 = joint_coordi_info[i][0]
+                joint1 = joint_coordi_info[i][1]
+                joint2 = joint_coordi_info[i][2]
+                joint3 = joint_coordi_info[i][3]
+
+    print(joint0)
+    print(joint1)
+    print(joint2)
+    print(joint3)
+    print(coordinate)
+    #x_new = int(x)
+    #print(x_new)
+
+
+    #x1 = (l1 * np.sin(j1_pi) + l2 * np.sin(j1_pi + j2_pi) + l3 * np.sin(j1_pi + j2_pi + j3_pi)) * np.cos(j0_pi)
+    #y1 = (l1 * np.sin(j1_pi) + l2 * np.sin(j1_pi + j2_pi) + l3 * np.sin(j1_pi + j2_pi + j3_pi)) * np.sin(j0_pi)
+    #z1 = l1 * np.cos(j1_pi) + l2 * np.cos(j1_pi + j2_pi) + l3 * np.cos(j1_pi + j2_pi + j3_pi)
+
 
 if __name__ == '__main__':
-    invers_two()
-#invers(10,7,9)
-#invers_two(0,2.8,1)
+    searching_file(0.6789,10.22335454,1.5677)
+    #invers_two()
+    #invers(10,7,9)
+    #invers_two(0,2.8,1)
 
-# joint4 in range from -pi/2 <= theta4 <= pi/2
-# joint3 (-2.4,2.5)
-#joint2 (-2,2.25)
+    # joint4 in range from -pi/2 <= theta4 <= pi/2
+    # joint3 (-2.4,2.5)
+    #joint2 (-2,2.25)
