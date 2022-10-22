@@ -30,19 +30,21 @@ def sample():
     # 2.圆心坐标
     a=0
     b = 19
-    m =[0 for i in range(60)]
+    m =[0 for i in range(61)]
     m[0] = -15
-    for i in range(1,60):
+    for i in range(1,61):
         m[i] = m[i-1] + 0.5
     print(m)
-    n = [0 for i in range(60)]
+    n = [0 for i in range(61)]
     n[0] = 5
-    for i in range(1, 60):
+    for i in range(1, 61):
         n[i] = n[i - 1] + 0.5
     print(n)
+    print(len(n))
+    print(len(m))
     mat = np.zeros(shape=(1793,3))
     for i in range(1793):
-        mat[i][2] = 1.5
+        mat[i][2] = 2
     flag=0
     # ==========================================
     # 方法一：参数方程
@@ -52,8 +54,8 @@ def sample():
     fig = plt.figure()
     axes = fig.add_subplot(111)
     plt.ylim(0,45)
-    for i in range(60):
-        for j in range(60):
+    for i in range(61):
+        for j in range(61):
            #result = any(np.sqrt((m[i]-a)*(m[i]-a)+(n[j]-b)*(n[j]-b))<=12)
            if np.sqrt((m[i]-a)*(m[i]-a)+(n[j]-b)*(n[j]-b))<=12:
               plt.scatter(m[i],n[j])
@@ -82,7 +84,7 @@ def invers_two( ):
 
         l1 = 11.75
         l2 = 9.5
-        l3 = 11
+        l3 = 9.5
         j0_pi = np.arctan2(y, x)
         a = x / np.cos(j0_pi)
         if (x == 0):
@@ -112,7 +114,7 @@ def invers_two( ):
                     if abs(theta2) < 0.1:
                        continue
                        '''''
-                    if x1 < (x + 1) and x1 > (x -1 ) and y1 < (y + 1) and y1 > (y - 1) and z1 < (z + 0.5) and z1 > (z - 0.5):
+                    if x1 < (x +0.1) and x1 > (x -0.1 ) and y1 < (y + 0.1) and y1 > (y - 0.1) and z1 < (z + 0.1) and z1 > (z - 0.1):
                         joint_mat[i][0] = theta0
                         joint_mat[i][1] = theta1
                         joint_mat[i][2] = theta2
@@ -121,6 +123,8 @@ def invers_two( ):
                         joint_mat[i][5] = mat[i][1]
                         joint_mat[i][6] = mat[i][2]
                         print(joint_mat[i])
+                        raw = [x1,y1,z1+l0]
+                        print(raw)
                         num = num+1
                         print(num)
                         '''''
@@ -138,7 +142,7 @@ def invers_two( ):
                         flag =1
                         if flag ==1:
                             break
-    np.savetxt(r'test.txt', joint_mat, fmt='%s', delimiter=',')
+    np.savetxt(r'test2.txt', joint_mat, fmt='%s', delimiter=',')
 
 
 def invers(x,y,z_init):
@@ -233,7 +237,7 @@ def invers(x,y,z_init):
     if i==0:
         print("no answer")
 def read_file():
-    fname = 'test.txt'
+    fname = 'test2.txt'
     with open(fname, 'r+', encoding='utf-8') as f:
         s = [i[:-1].split(',') for i in f.readlines()]
     transer_data = np.zeros(shape=(1793, 7))
@@ -241,6 +245,14 @@ def read_file():
     for i in range(1793):
         for j in range(7):
             transer_data[i][j] = float(s[i][j])
+    fig = plt.figure()
+    axes = fig.add_subplot(111)
+    plt.ylim(0, 45)
+    for i in range(len(transer_data)):
+        plt.scatter(transer_data[i][4],transer_data[i][5])
+    axes.axis('equal')
+    plt.title('www.ai8py.com')
+    plt.show()
     #print(transer_data)
     return transer_data
 def searching_file(x,y,z):
