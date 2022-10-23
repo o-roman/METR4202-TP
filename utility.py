@@ -16,6 +16,7 @@ class TagCube:
             self.id = None
             self.colour = None
             self.position = None
+            self.corner = None
         else:
             self.id = msg.id
             self.colour = msg.colour
