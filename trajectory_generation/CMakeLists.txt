@@ -8,6 +8,11 @@ project(trajectory_generation)
 ## if COMPONENTS list like find_package(catkin REQUIRED COMPONENTS xyz)
 ## is used, also find other catkin packages
 find_package(catkin REQUIRED COMPONENTS
+    roscpp
+    rospy
+    std_msgs
+    sensor_msgs
+    geometry_msgs
     message_generation
 )
 
@@ -48,7 +53,7 @@ find_package(catkin REQUIRED COMPONENTS
 add_message_files(
     FILES
     TagPose.msg
-#   Message2.msg
+    JointStateArray.msg
 )
 
 ## Generate services in the 'srv' folder
@@ -69,6 +74,9 @@ add_message_files(
 generate_messages(
     DEPENDENCIES
     std_msgs  # Or other packages containing msgs
+    sensor_msgs
+    geometry_msgs
+    sensor_msgs  # Or other packages containing msgs
 )
 
 ################################################
@@ -103,7 +111,7 @@ generate_messages(
 catkin_package(
 #  INCLUDE_DIRS include
 #  LIBRARIES trajectory_generation
-  CATKIN_DEPENDS message_runtime
+    CATKIN_DEPENDS message_runtime
 #  DEPENDS system_lib
 )
 
@@ -114,8 +122,8 @@ catkin_package(
 ## Specify additional locations of header files
 ## Your package locations should be listed before other locations
 include_directories(
-# include
-# ${catkin_INCLUDE_DIRS}
+include
+ ${catkin_INCLUDE_DIRS}
 )
 
 ## Declare a C++ library
@@ -131,6 +139,7 @@ include_directories(
 ## Declare a C++ executable
 ## With catkin_make all packages are built within a single CMake context
 ## The recommended prefix ensures that target names across packages don't collide
+
 # add_executable(${PROJECT_NAME}_node src/trajectory_generation_node.cpp)
 
 ## Rename C++ executable without prefix
