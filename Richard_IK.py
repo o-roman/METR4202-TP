@@ -1,3 +1,5 @@
+#!/usr/bin/env python3
+from re import T
 import numpy as np
 
 def IKinSpace(x,y,z):
@@ -8,6 +10,7 @@ def IKinSpace(x,y,z):
 
     j0 = np.arctan2(y,x)
     L=x/np.cos(j0)
+    thetalist = np.empty((1,4))
     for theta2 in range(0,90):
         j1 = theta2 / 180 * np.pi
      
@@ -26,10 +29,11 @@ def IKinSpace(x,y,z):
         if -1<ac1<1 and -1<ac2<1:
             j3 = np.pi-np.arccos(ac1)
             j2 = np.pi-j1-beta-np.arccos(ac2)
-            A=L*np.cos(j0)
-            B=L*np.sin(j0)
-            C=L1+L2*np.cos(j1)+L3*np.cos(j1+j2)+L4*np.cos(j1+j2+j3)
-            print(j0,j1,j2,j3,A,B,C)
+            # A=L*np.cos(j0)
+            # B=L*np.sin(j0)
+            # C=L1+L2*np.cos(j1)+L3*np.cos(j1+j2)+L4*np.cos(j1+j2+j3)
+            thetalist = np.append(thetalist,[[j0,j1,j2,j3]],axis=0)
+            # print(j0,j1,j2,j3,A,B,C)
         else:
             pass
         '''
@@ -45,3 +49,4 @@ def IKinSpace(x,y,z):
             else:
                 pass
         '''
+    return thetalist
