@@ -1,4 +1,4 @@
-#!/usr#!/usr/bin/env python3
+#!/usr/bin/env python3
 from re import T
 import numpy as np
 import rospy
@@ -42,27 +42,27 @@ def joint_validation(joint_ans):
 
        Implementation for now: Validate answers with angle limits then only rewrite [i] answer with [i+1] answer
     """
-    N = len(joint_ans)
+    N = np.shape(joint_ans)[0]
 
-    first_valid = np.zeros((N, 4))
+    valid_joint = []
     
-    for i in range(N):
-        joint_angle_1 = joint_ans[i, 0]
-        joint_angle_2 = joint_ans[i, 1]
-        joint_angle_3 = joint_ans[i, 2]
-        joint_angle_4 = joint_ans[i, 3]
+    for joints in joint_ans:
+        joint_angle_1 = joints[0]
+        joint_angle_2 = joints[1]
+        joint_angle_3 = joints[2]
+        joint_angle_4 = joints[3]
         
         if d2r(-40) <= joint_angle_1 <= d2r(40) and 0 <= joint_angle_2 <= d2r(90) and 0 <= joint_angle_3 <= d2r(150) and 0 <= joint_angle_4 <= (np.pi - joint_angle_2 - joint_angle_3):
-            first_valid[i] = joint_ans[i]
+            valid_joint.append(joints)
         else:
             pass
 
     # n = 0
     
     valid_ans = np.zeros((1,4))
-    for i in range(N):
-        if list(first_valid[i]) != [0,0,0,0]:
-            valid_ans = first_valid[i]
+    for joints in valid_joint:
+        if joints != [0,0,0,0]:
+            valid_ans = joints
         else:
             pass
 
@@ -238,24 +238,32 @@ def joint_traj_gen(theta_end,T,scale):
 # #
 # #     if X_s 
 
-class TrajectoryNode:
-    def __init__(self):
-        rospy.init_node('trajectory_gen_node')
-        self.raw_theta_end_sub = rospy.Subscriber('/raw_theta_end', data_class=JointState, callback=self.raw_theta_end_callback)
-        self.traj_theta_end_pub = rospy.Publisher('/desired_joint_states', data_class=JointState, queue_size = 10)
 
-    def raw_theta_end_callback(self,msg:JointState):
-        raw_theta_end_sub = msg.position
-        logging.info("Raw theta_end received")
-        print(raw_theta_end_sub[0], raw_theta_end_sub[1], raw_theta_end_sub[2],raw_theta_end_sub[3])
 
+def raw_theta_end_callback(msg:JointState):
+        
+        array = np.zeros(shape=(100,4))
+        for i in range(100):
+            array[i] = msg.position
+             
+        a = joint_traj_gen(joint_validation(array),5,7)
+        print(a)        
+            
 
 def main():
-    traj_node = TrajectoryNode()
-    joint_traj_gen(joint_validation(traj_node.raw_theta_end),5,7)
+    global pub
+    global i
+    i=0
+    rospy.init_node('trajectory_gen_node')
+    traj_theta_end_pub = rospy.Publisher('/desired_joint_states', JointState, queue_size = 10)
+
+    raw_theta_end_sub = rospy.Subscriber('/raw_theta_end', JointState, raw_theta_end_callback)
+    rate = rospy.Rate(10)
+    rospy.spin()
     # traj_d2h = back2home_traj_gen(joint_validation(theta_end),5,7)
     # traj_h2z = 
     
 
 if __name__ == '__main__':
+    
     main()

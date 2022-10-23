@@ -78,3 +78,7 @@ def FKs(thetalist):
     Tsb = np.dot(T01,np.dot(T12,np.dot(T23,np.dot(T34,M))))
     
     return Tsb
+
+
+
+
