@@ -39,31 +39,35 @@ def FKs(thetalist):
     w4_so3 = np.array([[0,-w4[2],w4[1]],
                        [w4[2],0,-w4[0]],
                        [-w4[1],w4[0],0]])
-    # v1_so3 = np.array([[0,-v1[2],v1[1]],
-    #                    [v1[2],0,-v1[0]],
-    #                    [-v1[1],v1[0],0]])
-    # v2_so3 = np.array([[0,-v2[2],v2[1]],
-    #                    [v2[2],0,-v2[0]],
-    #                    [-v2[1],v2[0],0]])
-    # v3_so3 = np.array([[0,-v3[2],v3[1]],
-    #                    [v3[2],0,-v3[0]],
-    #                    [-v3[1],v3[0],0]])
-    # v4_so3 = np.array([[0,-v4[2],v4[1]],
-    #                    [v4[2],0,-v4[0]],
-    #                    [-v4[1],v4[0],0]])
+    # v1_vec = np.array([[v1[0]],
+    #                    [v1[1]],
+    #                    [v1[2]]])
+    # v2_vec = np.array([[v2[0]],
+    #                    [v2[1]],
+    #                    [v2[2]]])
+    # v3_vec = np.array([[v3[0]],
+    #                    [v3[1]],
+    #                    [v3[2]]])
+    # v4_vec = np.array([[v4[0]],
+    #                    [v4[1]],
+    #                    [v4[2]]])
 
-    R1 = I + np.sin(theta0) * w1_so3 + (1-np.cos(theta0)) * (w1_so3**2)
-    R2 = I + np.sin(theta1) * w2_so3 + (1-np.cos(theta1)) * (w2_so3**2)
-    R3 = I + np.sin(theta2) * w3_so3 + (1-np.cos(theta2)) * (w3_so3**2)
-    R4 = I + np.sin(theta3) * w4_so3 + (1-np.cos(theta3)) * (w4_so3**2)
-    G1 = I * theta0 + (1-np.cos(theta0)) * w1_so3 + (theta0 - np.sin(theta0)) * (w1_so3**2)
-    G2 = I * theta1 + (1-np.cos(theta1)) * w2_so3 + (theta1 - np.sin(theta1)) * (w2_so3**2)
-    G3 = I * theta2 + (1-np.cos(theta2)) * w3_so3 + (theta2 - np.sin(theta2)) * (w3_so3**2)
-    G4 = I * theta3 + (1-np.cos(theta3)) * w4_so3 + (theta3 - np.sin(theta3)) * (w4_so3**2)
+    R1 = I + np.sin(theta0) * w1_so3 + (1-np.cos(theta0)) * (np.dot(w1_so3,w1_so3))
+    R2 = I + np.sin(theta1) * w2_so3 + (1-np.cos(theta1)) * (np.dot(w2_so3,w2_so3))
+    R3 = I + np.sin(theta2) * w3_so3 + (1-np.cos(theta2)) * (np.dot(w3_so3,w3_so3))
+    R4 = I + np.sin(theta3) * w4_so3 + (1-np.cos(theta3)) * (np.dot(w4_so3,w4_so3))
+    G1 = I * theta0 + (1-np.cos(theta0)) * w1_so3 + (theta0 - np.sin(theta0)) * (np.dot(w1_so3,w1_so3))
+    G2 = I * theta1 + (1-np.cos(theta1)) * w2_so3 + (theta1 - np.sin(theta1)) * (np.dot(w2_so3,w2_so3))
+    G3 = I * theta2 + (1-np.cos(theta2)) * w3_so3 + (theta2 - np.sin(theta2)) * (np.dot(w3_so3,w3_so3))
+    G4 = I * theta3 + (1-np.cos(theta3)) * w4_so3 + (theta3 - np.sin(theta3)) * (np.dot(w4_so3,w4_so3))
     G1v = np.dot(G1,v1)
     G2v = np.dot(G2,v2)
     G3v = np.dot(G3,v3)
     G4v = np.dot(G4,v4)
+    # G1v = np.array(np.dot(G1,v1_vec)).T
+    # G2v = np.array(np.dot(G2,v2_vec)).T
+    # G3v = np.array(np.dot(G3,v3_vec)).T
+    # G4v = np.array(np.dot(G4,v4_vec)).T
 
     T01 = np.insert(np.insert(R1,3,values=G1v,axis=1),3,values=np.array([0,0,0,1]),axis=0)
     T12 = np.insert(np.insert(R2,3,values=G2v,axis=1),3,values=np.array([0,0,0,1]),axis=0)
