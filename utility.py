@@ -12,9 +12,14 @@ class TagCube:
 
     def __init__(self, msg):
         # FIXME: Make sure this msg type is set up
-        self.id = msg.id
-        self.colour = msg.colour
-        self.position = msg.position
+        if msg == None:
+            self.id = None
+            self.colour = None
+            self.position = None
+        else:
+            self.id = msg.id
+            self.colour = msg.colour
+            self.position = msg.position
 	
     # TODO: Consider changing this to be position differences between two cubes and changing bin distance to something else
     # Overloading comparison functions to make sorting easier
