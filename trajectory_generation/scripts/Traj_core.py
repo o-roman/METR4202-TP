@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+#!/usr#!/usr/bin/env python3
 from re import T
 import numpy as np
 import rospy
@@ -241,13 +241,13 @@ def joint_traj_gen(theta_end,T,scale):
 class TrajectoryNode:
     def __init__(self):
         rospy.init_node('trajectory_gen_node')
-        self.raw_theta_end = rospy.Subscriber('/raw_theta_end', data_class=JointState, callback=self.raw_theta_end_callback)
-        self.traj_theta_end = rospy.Publisher('/desired_joint_states', data_class=JointState, queue_size = 10)
+        self.raw_theta_end_sub = rospy.Subscriber('/raw_theta_end', data_class=JointState, callback=self.raw_theta_end_callback)
+        self.traj_theta_end_pub = rospy.Publisher('/desired_joint_states', data_class=JointState, queue_size = 10)
 
     def raw_theta_end_callback(self,msg:JointState):
-        raw_theta_end = msg.position
+        raw_theta_end_sub = msg.position
         logging.info("Raw theta_end received")
-        print(raw_theta_end[0],raw_theta_end[1],raw_theta_end[2],raw_theta_end[3])
+        print(raw_theta_end_sub[0], raw_theta_end_sub[1], raw_theta_end_sub[2],raw_theta_end_sub[3])
 
 
 def main():

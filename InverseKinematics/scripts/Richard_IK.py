@@ -2,6 +2,7 @@
 from re import T
 import numpy as np
 import rospy
+import logging
 from sensor_msgs.msg import *
 from geometry_msgs.msg import *
 from std_msgs import *
@@ -55,13 +56,22 @@ def IKinSpace(x,y,z):
         '''
     return thetalist
 
-def inverse_kinematics(pose:Pose)-> JointState:
-    global pub
-    rospy.loginfo(f'Got desired pose\n[\n\')
+class InverseKinematicsNode:
+    def __init__(self):
+        rospy.init_node('IK_node')
+        self.desired_pose_sub = rospy.Subscriber('/desired_pose', data_class=Pose, callback=self.desired_pose_callback)
+        self.raw_theta_end_pub = rospy.Publisher('/raw_theta_end',data_class=JointState, queue_size = 10)
+
+    def desired_pose_callback(self, msg:Pose):
+        desired_pose_sub = msg.position
+        logging.info('Desired pose received')
+        pring(desired_pose_sub[0], desired_pose_sub[1], desired_pose_sub[2])
 
 
-
+def main():
+    ik_node = InverseKinematicsNode()
+    IKinSpace(ik_node[0], ik_node[1], ik_node[2])
 
 
 if __name__ == "__main__":
-    theta_end = IKinSpace(x=,y=,z=)
+    main()

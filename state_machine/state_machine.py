@@ -41,7 +41,7 @@ class StateMachineNode:
         # Instantiating all the required publishers and subscribers associated with this node
         self.tag_pose_sub = rospy.Subscriber("/tag_pose", data_class=Pose, callback=self.tag_pose_callback)
         self.end_effector_pose_sub  = rospy.Subscriber("/end_effector_pose", data_class=Pose, callback=self.end_effector_pose_callback)
-        self.desired_pose_pub = rospy.Publisher("/desired_pose", data_class=JointState, queue_size=10)
+        self.desired_pose_pub = rospy.Publisher("/desired_pose", data_class=Pose, queue_size=10)
         self.gripper_pub = rospy.Publisher("/gripper", Float32, queue_size=10)
         self.rate = rospy.Rate(10)
 
