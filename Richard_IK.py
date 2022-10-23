@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 from re import T
 import numpy as np
-import roslibpy
+import rospy
 from sensor_msgs.msg import *
 from geometry_msgs.msg import *
 from std_msgs import *
@@ -54,6 +54,14 @@ def IKinSpace(x,y,z):
                 pass
         '''
     return thetalist
+
+def inverse_kinematics(pose:Pose)-> JointState:
+    global pub
+    rospy.loginfo(f'Got desired pose\n[\n\')
+
+
+
+
 
 if __name__ == "__main__":
     theta_end = IKinSpace(x=,y=,z=)
