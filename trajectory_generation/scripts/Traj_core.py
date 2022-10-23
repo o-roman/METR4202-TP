@@ -1,6 +1,10 @@
 #!/usr/bin/env python3
 from re import T
 import numpy as np
+import roslibpy
+from sensor_msgs.msg import *
+from geometry_msgs.msg import *
+from std_msgs import *
 
 def d2r(deg):
     """Simply change degree angle to radius angle
@@ -232,3 +236,8 @@ def end_point_traj_gen(X_start,X_end,t,T,scale):
 # def end_point_validation(X_s):
 #
 #     if X_s 
+if __name__ == '__main__':
+    pose_traj = joint_traj_gen(theta_end=, 5, 7)
+    p2h_traj = back2home_traj_gen(theta_end=,5,7)
+    h2z_traj = home2zone_traj_gen(theta_end=,5,7)
+    z2h_traj = zone2home_traj_gen(theta_end=,5,7)

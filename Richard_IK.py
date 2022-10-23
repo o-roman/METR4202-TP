@@ -1,6 +1,10 @@
 #!/usr/bin/env python3
 from re import T
 import numpy as np
+import roslibpy
+from sensor_msgs.msg import *
+from geometry_msgs.msg import *
+from std_msgs import *
 
 def IKinSpace(x,y,z):
     L1 = 100
@@ -50,3 +54,6 @@ def IKinSpace(x,y,z):
                 pass
         '''
     return thetalist
+
+if __name__ == "__main__":
+    theta_end = IKinSpace(x=,y=,z=)
