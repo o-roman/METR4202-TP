@@ -10,7 +10,8 @@ from std_msgs.msg import Header
 from std_msgs.msg import String
 from sensor_msgs.msg import JointState
 from geometry_msgs.msg import Pose
-
+from fiducial_msgs.msg import FiducialTransform
+from fiducial_msgs.msg import FiducialTransformArray
 def IKinSpace(x,y,z):
     L1 = 100
     L2 = 117.5
@@ -61,12 +62,19 @@ def IKinSpace(x,y,z):
        
     return thetalist
 
-def callback(pose: Pose)-> JointState:
+def callback(fidTrans)-> JointState:
     
     global pub
     # TODO: Have fun :)
-    rospy.loginfo(f'Got desired pose\n[\n\tpos:\n{pose.position}\nrot:\n{pose.orientation}\n]')
-    thetalist = IKinSpace(pose.position.x,pose.position.y,pose.position.z)
+    x = fidTrans.transforms[0].transform.translation.y*1000
+    y= -fidTrans.transforms[0].transform.translation.x*1000
+    x=x+250
+    z = 20
+    
+    print("x: ",x)
+    print("y: ",y)
+    print("z: ",z)
+    thetalist = IKinSpace(x,y,z)
     
     msg_list = []
     '''''
@@ -96,10 +104,10 @@ def main():
     global pub
     # Create publisher
     pub = rospy.Publisher('raw_theta_end',JointState,queue_size=10)
-    rospy.init_node('joint_state_publisher')
+    rospy.init_node('ik')
     sub = rospy.Subscriber(
-        'desired_pose', # Topic name
-        Pose, # Message type
+      '/fiducial_transforms',
+        FiducialTransformArray, 
         callback # Callback function (required)
     )
 
