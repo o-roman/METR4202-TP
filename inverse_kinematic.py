@@ -84,7 +84,7 @@ def invers_two( ):
 
         l1 = 11.75
         l2 = 9.5
-        l3 = 9.5
+        l3 = 10.5
         j0_pi = np.arctan2(y, x)
         a = x / np.cos(j0_pi)
         if (x == 0):
@@ -142,7 +142,7 @@ def invers_two( ):
                         flag =1
                         if flag ==1:
                             break
-    np.savetxt(r'test2.txt', joint_mat, fmt='%s', delimiter=',')
+    np.savetxt(r'test3.txt', joint_mat, fmt='%s', delimiter=',')
 
 
 def invers(x,y,z_init):
@@ -242,7 +242,7 @@ def read_file():
         s = [i[:-1].split(',') for i in f.readlines()]
     transer_data = np.zeros(shape=(1793, 7))
 
-    for i in range(1793):
+    for i in range(1702):
         for j in range(7):
             transer_data[i][j] = float(s[i][j])
     fig = plt.figure()
