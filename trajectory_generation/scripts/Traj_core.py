@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 from re import T
 import numpy as np
-import roslibpy
+import rospy
 from sensor_msgs.msg import *
 from geometry_msgs.msg import *
 from std_msgs import *
@@ -99,145 +99,156 @@ def joint_traj_gen(theta_end,T,scale):
 
     return theta_s
 
-def back2home_traj_gen(theta_end,T,scale):
-    """Generate trejactory from current pose to home pose, sample at each second
-    """
-    joint_traj = joint_traj_gen(theta_end,T,scale)
-    theta_b2h = np.zeros((T,4))
-    for i in range(T-1):
-        theta_b2h[i] = joint_traj[T-2-i]
+# def back2home_traj_gen(theta_end,T,scale):
+#     """Generate trejactory from current pose to home pose, sample at each second
+#     """
+#     joint_traj = joint_traj_gen(theta_end,T,scale)
+#     theta_b2h = np.zeros((T,4))
+#     for i in range(T-1):
+#         theta_b2h[i] = joint_traj[T-2-i]
     
-    # theta_b2h[0] = joint_traj[3]
-    # theta_b2h[1] = joint_traj[2]
-    # theta_b2h[2] = joint_traj[1]
-    # theta_b2h[3] = joint_traj[0]
-    # theta_b2h[4] = theta_start
+#     # theta_b2h[0] = joint_traj[3]
+#     # theta_b2h[1] = joint_traj[2]
+#     # theta_b2h[2] = joint_traj[1]
+#     # theta_b2h[3] = joint_traj[0]
+#     # theta_b2h[4] = theta_start
     
     
-    return theta_b2h
+#     return theta_b2h
 
-def home2zone_traj_gen(theta_end,T,scale):
-    """Generate trajectory from home pose to required zone
-    """
-    theta_start = np.array([0,0,0,0])
-    theta_h2z = np.zeros((T,4))
-    for i in range(T):
-        if scale == 3:
-            s = third_poly_scale(i+1,T)
-        elif scale == 5:
-            s = fifth_poly_scale(i+1,T)
-        elif scale == 7:
-            s = seventh_poly_scale(i+1,T)
-        else:
-            print("Please enter a proper scale method from 3,5,7")
-        theta_h2z[i] = theta_start + s * (theta_end - theta_start)
+# def home2zone_traj_gen(theta_end,T,scale):
+#     """Generate trajectory from home pose to required zone
+#     """
+#     theta_start = np.array([0,0,0,0])
+#     theta_h2z = np.zeros((T,4))
+#     for i in range(T):
+#         if scale == 3:
+#             s = third_poly_scale(i+1,T)
+#         elif scale == 5:
+#             s = fifth_poly_scale(i+1,T)
+#         elif scale == 7:
+#             s = seventh_poly_scale(i+1,T)
+#         else:
+#             print("Please enter a proper scale method from 3,5,7")
+#         theta_h2z[i] = theta_start + s * (theta_end - theta_start)
     
-    # theta_s = np.zeros((6,4))
+#     # theta_s = np.zeros((6,4))
     
-    # theta_s[0] = theta_start
-    # theta_s[1] = theta_start + s * (theta_start - theta_end) * 0.2
-    # theta_s[2] = theta_start + s * (theta_start - theta_end) * 0.4
-    # theta_s[3] = theta_start + s * (theta_start - theta_end) * 0.6
-    # theta_s[4] = theta_start + s * (theta_start - theta_end) * 0.8
-    # theta_s[5] = theta_start + s * (theta_start - theta_end) * 1
+#     # theta_s[0] = theta_start
+#     # theta_s[1] = theta_start + s * (theta_start - theta_end) * 0.2
+#     # theta_s[2] = theta_start + s * (theta_start - theta_end) * 0.4
+#     # theta_s[3] = theta_start + s * (theta_start - theta_end) * 0.6
+#     # theta_s[4] = theta_start + s * (theta_start - theta_end) * 0.8
+#     # theta_s[5] = theta_start + s * (theta_start - theta_end) * 1
     
-    return theta_h2z
+#     return theta_h2z
     
-    # zone1 = np.asarray([[   0,    0,  0,    0],
-    #                     [21.6,  4.2, 14, 15.6],
-    #                     [43.2,  8.4, 28, 31.2],
-    #                     [64.8, 12.6, 42, 46.8],
-    #                     [86.4, 16.8, 56, 62.4],
-    #                     [ 108,   21, 70,   78]])
-    # zone2 = np.asarray([[    0,    0,  0,    0],
-    #                     [ 32.4,  4.2, 14, 15.6],
-    #                     [ 64.8,  8.4, 28, 31.2],
-    #                     [ 97.2, 12.6, 42, 46.8],
-    #                     [129.6, 16.8, 56, 62.4],
-    #                     [  162,   21, 70,   78]])
-    # zone3 = np.asarray([[    0,    0,  0,    0],
-    #                     [-21.6,  4.2, 14, 15.6],
-    #                     [-43.2,  8.4, 28, 31.2],
-    #                     [-64.8, 12.6, 42, 46.8],
-    #                     [-86.4, 16.8, 56, 62.4],
-    #                     [ -108,   21, 70,   78]])
-    # zone4 = np.asarray([[     0,    0,  0,    0],
-    #                     [ -32.4,  4.2, 14, 15.6],
-    #                     [ -64.8,  8.4, 28, 31.2],
-    #                     [ -97.2, 12.6, 42, 46.8],
-    #                     [-129.6, 16.8, 56, 62.4],
-    #                     [  -162,   21, 70,   78]])
+#     # zone1 = np.asarray([[   0,    0,  0,    0],
+#     #                     [21.6,  4.2, 14, 15.6],
+#     #                     [43.2,  8.4, 28, 31.2],
+#     #                     [64.8, 12.6, 42, 46.8],
+#     #                     [86.4, 16.8, 56, 62.4],
+#     #                     [ 108,   21, 70,   78]])
+#     # zone2 = np.asarray([[    0,    0,  0,    0],
+#     #                     [ 32.4,  4.2, 14, 15.6],
+#     #                     [ 64.8,  8.4, 28, 31.2],
+#     #                     [ 97.2, 12.6, 42, 46.8],
+#     #                     [129.6, 16.8, 56, 62.4],
+#     #                     [  162,   21, 70,   78]])
+#     # zone3 = np.asarray([[    0,    0,  0,    0],
+#     #                     [-21.6,  4.2, 14, 15.6],
+#     #                     [-43.2,  8.4, 28, 31.2],
+#     #                     [-64.8, 12.6, 42, 46.8],
+#     #                     [-86.4, 16.8, 56, 62.4],
+#     #                     [ -108,   21, 70,   78]])
+#     # zone4 = np.asarray([[     0,    0,  0,    0],
+#     #                     [ -32.4,  4.2, 14, 15.6],
+#     #                     [ -64.8,  8.4, 28, 31.2],
+#     #                     [ -97.2, 12.6, 42, 46.8],
+#     #                     [-129.6, 16.8, 56, 62.4],
+#     #                     [  -162,   21, 70,   78]])
 
-    # if zone == 1:
-    #     return d2r(zone1)
-    # elif zone == 2:
-    #     return d2r(zone2)
-    # elif zone == 3:
-    #     return d2r(zone3)
-    # elif zone == 4:
-    #     return d2r(zone4)
-    # else:
-    #     print("Please select a proper drop zone 1,2,3,4")
+#     # if zone == 1:
+#     #     return d2r(zone1)
+#     # elif zone == 2:
+#     #     return d2r(zone2)
+#     # elif zone == 3:
+#     #     return d2r(zone3)
+#     # elif zone == 4:
+#     #     return d2r(zone4)
+#     # else:
+#     #     print("Please select a proper drop zone 1,2,3,4")
     
 
-def zone2home_traj_gen(theta_end,T,scale):
-    """Generate trajectory from zone pose to home pose
-    """
-    # if zone == 1:
-    #     z2h = np.asarray([[ 108,   21, 70,   78],
-    #                       [86.4, 16.8, 56, 62.4],
-    #                       [64.8, 12.6, 42, 46.8],
-    #                       [43.2,  8.4, 28, 31.2],
-    #                       [21.6,  4.2, 14, 15.6],
-    #                       [   0,    0,  0,    0]])
-    # elif zone == 2:
-    #     z2h = np.asarray([[  162,   21, 70,   78],
-    #                       [129.6, 16.8, 56, 62.4],
-    #                       [ 97.2, 12.6, 42, 46.8],
-    #                       [ 64.8,  8.4, 28, 31.2],
-    #                       [ 32.4,  4.2, 14, 15.6],
-    #                       [    0,    0,  0,    0]])
-    # elif zone == 3:
-    #     z2h = np.asarray([[ -108,   21, 70,   78],
-    #                       [-86.4, 16.8, 56, 62.4],
-    #                       [-64.8, 12.6, 42, 46.8],
-    #                       [-43.2,  8.4, 28, 31.2],
-    #                       [-21.6,  4.2, 14, 15.6],
-    #                       [    0,    0,  0,    0]])
-    # elif zone == 4:
-    #     z2h = np.asarray([[  -162,   21, 70,   78],
-    #                       [-129.6, 16.8, 56, 62.4],
-    #                       [ -97.2, 12.6, 42, 46.8],
-    #                       [ -64.8,  8.4, 28, 31.2],
-    #                       [ -32.4,  4.2, 14, 15.6],
-    #                       [     0,    0,  0,    0]])
-    # else:
-    #     print("Please select a proper drop zone 1,2,3,4")
-    joint_traj = joint_traj_gen(theta_end,T,scale)
-    traj_z2h = np.zeros((T,4))
-    for i in range(T-1):
-        traj_z2h[i] = joint_traj[T-2-i]
+# def zone2home_traj_gen(theta_end,T,scale):
+#     """Generate trajectory from zone pose to home pose
+#     """
+#     # if zone == 1:
+#     #     z2h = np.asarray([[ 108,   21, 70,   78],
+#     #                       [86.4, 16.8, 56, 62.4],
+#     #                       [64.8, 12.6, 42, 46.8],
+#     #                       [43.2,  8.4, 28, 31.2],
+#     #                       [21.6,  4.2, 14, 15.6],
+#     #                       [   0,    0,  0,    0]])
+#     # elif zone == 2:
+#     #     z2h = np.asarray([[  162,   21, 70,   78],
+#     #                       [129.6, 16.8, 56, 62.4],
+#     #                       [ 97.2, 12.6, 42, 46.8],
+#     #                       [ 64.8,  8.4, 28, 31.2],
+#     #                       [ 32.4,  4.2, 14, 15.6],
+#     #                       [    0,    0,  0,    0]])
+#     # elif zone == 3:
+#     #     z2h = np.asarray([[ -108,   21, 70,   78],
+#     #                       [-86.4, 16.8, 56, 62.4],
+#     #                       [-64.8, 12.6, 42, 46.8],
+#     #                       [-43.2,  8.4, 28, 31.2],
+#     #                       [-21.6,  4.2, 14, 15.6],
+#     #                       [    0,    0,  0,    0]])
+#     # elif zone == 4:
+#     #     z2h = np.asarray([[  -162,   21, 70,   78],
+#     #                       [-129.6, 16.8, 56, 62.4],
+#     #                       [ -97.2, 12.6, 42, 46.8],
+#     #                       [ -64.8,  8.4, 28, 31.2],
+#     #                       [ -32.4,  4.2, 14, 15.6],
+#     #                       [     0,    0,  0,    0]])
+#     # else:
+#     #     print("Please select a proper drop zone 1,2,3,4")
+#     joint_traj = joint_traj_gen(theta_end,T,scale)
+#     traj_z2h = np.zeros((T,4))
+#     for i in range(T-1):
+#         traj_z2h[i] = joint_traj[T-2-i]
    
-    return traj_z2h
+#     return traj_z2h
 
-def end_point_traj_gen(X_start,X_end,t,T,scale):
-    """
-    Sample Text
-    """
-    if scale == 3:
-        s = third_poly_scale(t,5)
-    elif scale == 5:
-        s = fifth_poly_scale(t,5)
-    else:
-        s = seventh_poly_scale(t,5)
+# def end_point_traj_gen(X_start,X_end,t,T,scale):
+#     """
+#     Sample Text
+#     """
+#     if scale == 3:
+#         s = third_poly_scale(t,5)
+#     elif scale == 5:
+#         s = fifth_poly_scale(t,5)
+#     else:
+#         s = seventh_poly_scale(t,5)
     
-    X_s = X_start + s * (X_end - X_start)
+#     X_s = X_start + s * (X_end - X_start)
 
-# def end_point_validation(X_s):
-#
-#     if X_s 
+# # def end_point_validation(X_s):
+# #
+# #     if X_s 
+
+class TrajectoryNode:
+    def __init__(self):
+        rospy.init_node('trajectory_node')
+        self.theta_end = rospy.Subscriber("/theta_end", data_class=Pose, callback=self.tag_pose_callback)
+
+    def raw_theta_end_callback(self,theta_end:Pose)
+
+def main():
+    joint_traj_gen(joint_validation(theta_end),5,7)
+    # traj_d2h = back2home_traj_gen(joint_validation(theta_end),5,7)
+    # traj_h2z = 
+    
+
 if __name__ == '__main__':
-    pose_traj = joint_traj_gen(theta_end=, 5, 7)
-    p2h_traj = back2home_traj_gen(theta_end=,5,7)
-    h2z_traj = home2zone_traj_gen(theta_end=,5,7)
-    z2h_traj = zone2home_traj_gen(theta_end=,5,7)
+    main()
