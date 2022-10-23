@@ -59,8 +59,12 @@ def IKinSpace(x,y,z):
             else:
                 pass
         '''
-       
-    return thetalist
+    
+    lista = thetalist.tolist() 
+    #for i in range(len(lista)):
+    #    for j in range()
+    #lista = list(map(float,lista))
+    return lista
 
 def callback(fidTrans)-> JointState:
     
@@ -86,25 +90,26 @@ def callback(fidTrans)-> JointState:
     data = ['', 'name', msg_list,0, 0]
 
     '''''
-    
-    hello_str = JointState()
-    hello_str.header = Header()
-    hello_str.header.stamp = rospy.Time.now()
-    hello_str.name = ['joint0', 'joint1', 'joint2', 'joint3']
-    hello_str.position = thetalist
-    hello_str.velocity = []
-    hello_str.effort = []
-    pub.publish(hello_str)
-    print(hello_str)
-       
-        
+    for i in range(len(thetalist)):
+        hello_str = JointState()
+        hello_str.header = Header()
+        hello_str.header.stamp = rospy.Time.now()
+        hello_str.name = ['joint0', 'joint1', 'joint2', 'joint3']
+        hello_str.position = thetalist[i]
+        hello_str.velocity = []
+        hello_str.effort = []
+        pub.publish(hello_str)
+        print(hello_str)
+        hang = len(hello_str.position)
+        print(hang)   
+   
 
 
 def main():
     global pub
     # Create publisher
     pub = rospy.Publisher('raw_theta_end',JointState,queue_size=10)
-    rospy.init_node('ik')
+    rospy.init_node('ik',anonymous=True)
     sub = rospy.Subscriber(
       '/fiducial_transforms',
         FiducialTransformArray, 
