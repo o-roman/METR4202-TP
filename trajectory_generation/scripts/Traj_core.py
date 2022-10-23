@@ -2,7 +2,8 @@
 from re import T
 import numpy as np
 import rospy
-from sensor_msgs.msg import *
+import logging
+from sensor_msgs.msg import JointState
 from geometry_msgs.msg import *
 from std_msgs import *
 
@@ -239,13 +240,19 @@ def joint_traj_gen(theta_end,T,scale):
 
 class TrajectoryNode:
     def __init__(self):
-        rospy.init_node('trajectory_node')
-        self.theta_end = rospy.Subscriber("/theta_end", data_class=Pose, callback=self.tag_pose_callback)
+        rospy.init_node('trajectory_gen_node')
+        self.raw_theta_end = rospy.Subscriber('/raw_theta_end', data_class=JointState, callback=self.raw_theta_end_callback)
+        self.traj_theta_end = rospy.Publisher('/desired_joint_states', data_class=JointState, queue_size = 10)
 
-    def raw_theta_end_callback(self,theta_end:Pose)
+    def raw_theta_end_callback(self,msg:JointState):
+        raw_theta_end = msg.position
+        logging.info("Raw theta_end received")
+        print(raw_theta_end[0],raw_theta_end[1],raw_theta_end[2],raw_theta_end[3])
+
 
 def main():
-    joint_traj_gen(joint_validation(theta_end),5,7)
+    traj_node = TrajectoryNode()
+    joint_traj_gen(joint_validation(traj_node.raw_theta_end),5,7)
     # traj_d2h = back2home_traj_gen(joint_validation(theta_end),5,7)
     # traj_h2z = 
     
