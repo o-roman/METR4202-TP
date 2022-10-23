@@ -1,3 +1,5 @@
+#!/usr/bin/env python3
+from re import T
 import numpy as np
 
 def FKs(thetalist):
