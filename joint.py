@@ -13,9 +13,13 @@ import rospy
 # Import message types
 from std_msgs.msg import Header
 from sensor_msgs.msg import JointState
+from fiducial_msgs.msg import FiducialTransform
+from fiducial_msgs.msg import FiducialTransformArray
 from geometry_msgs.msg import Pose
 
 import numpy as np
+
+
 
 def read_file():
     fname = '/home/metr4202-team16/catkin_ws/src/metr4202_w7_prac/scripts/test2.txt'
@@ -97,100 +101,33 @@ def searching_file(x,y,z):
     print(joint_array)
     print(coordinate)
     return joint_array
-'''''
-def invers(x,y,z_init):
-    l0 = 10
-    z = z_init-l0
-    l1 = 11.75
-    l2 = 9.5
-    l3 = 11
-    i =0
-    j0_pi = np.arctan2(y,x)
-    a = x/np.cos(j0_pi)
-    #if (x ==0):
-    #   a = y
-    #b = z
-    joint_array =np.zeros(shape=(200,4))
-    joint_array_2 =np.zeros(shape=(200,4))
-    j=0
-    k=0
-    for j1 in range(-90,90):
-        j1_pi = j1 *(np.pi/180)
-        j3_pi = np.arccos((a*a + b*b +l1*l1 -l2*l2 -l3*l3 -2*a*l1*np.sin(j1_pi)-2*b*l1*np.cos(j1_pi))/(2*l2*l3))
-        m = l2 * np.sin(j1_pi) + l3*np.sin(j1_pi)*np.cos(j3_pi) + l3*np.cos(j1_pi)*np.sin(j3_pi)
-        n = l2 * np.cos(j1_pi) + l3 * np.cos(j1_pi) * np.cos(j3_pi) + l3 * np.sin(j1_pi) * np.sin(j3_pi)
-        t = a -l1*np.sin(j1_pi)
-        p =pow ((n*n + m*m),0.5)
-        q = np.arcsin(m/p)
-        j2_pi = np.arcsin(t/p) -q
 
-        x1 = (l1*np.sin(j1_pi) + l2*np.sin(j1_pi + j2_pi) + l3*np.sin(j1_pi+j2_pi+j3_pi))*np.cos(j0_pi)
-        y1 = (l1 * np.sin(j1_pi) + l2 * np.sin(j1_pi + j2_pi) + l3 * np.sin(j1_pi + j2_pi + j3_pi)) * np.sin(j0_pi)
-        z1 = l1 * np.cos(j1_pi) + l2 * np.cos(j1_pi + j2_pi) + l3 * np.cos(j1_pi + j2_pi + j3_pi)
-        theta1 = j1_pi
-        theta2 = j2_pi
-        theta0 = j0_pi
-        theta3 = j3_pi
-       
-        if x1 < (x + 1) and x1 > (x - 1) and y1 < (y + 1) and y1 > (y - 1) and z1 < (z + 1) and z1 > (z - 1):
-            joint_array[j][0] = -theta0
-            joint_array[j][1] = theta1
-            joint_array[j][2] = theta2
-            joint_array[j][3] = -theta3
-            
-            i = 1
-            j=j+1
-
-    for j1 in range(-90, 90):
-        j1_pi = j1 * (np.pi / 180)
-        j3_pi = np.arccos((a * a + b * b + l1 * l1 - l2 * l2 - l3 * l3 - 2 * a * l1 * np.sin( j1_pi) - 2 * b * l1 * np.cos(j1_pi)) / (2 * l2 * l3))
-        m = l2 * np.sin(j1_pi) + l3 * np.sin(j1_pi) * np.cos(j3_pi) + l3 * np.cos(j1_pi) * np.sin(j3_pi)
-        n = l2 * np.cos(j1_pi) + l3 * np.cos(j1_pi) * np.cos(j3_pi) + l3 * np.sin(j1_pi) * np.sin(j3_pi)
-        t = a - l1 * np.sin(j1_pi)
-        p = pow((n * n + m * m), 0.5)
-        q = np.arcsin(m / p)
-        j2_pi = -np.arcsin(t / p) - q
-
-        x1 = (l1 * np.sin(j1_pi) + l2 * np.sin(j1_pi + j2_pi) + l3 * np.sin(j1_pi + j2_pi + j3_pi)) * np.cos(j0_pi)
-        y1 = (l1 * np.sin(j1_pi) + l2 * np.sin(j1_pi + j2_pi) + l3 * np.sin(j1_pi + j2_pi + j3_pi)) * np.sin(j0_pi)
-        z1 = l1 * np.cos(j1_pi) + l2 * np.cos(j1_pi + j2_pi) + l3 * np.cos(j1_pi + j2_pi + j3_pi)
-        theta1 = j1_pi
-        theta2 = j2_pi
-        theta0 = j0_pi
-        theta3 = j3_pi
-        
-        if x1 < (x + 1) and x1 > (x - 1) and y1 < (y + 1) and y1 > (y - 1) and z1 < (z + 1) and z1 > (z - 1):
-            joint_array_2[k][0] = -theta0
-            joint_array_2[k][1] = theta1
-            joint_array_2[k][2] = theta2
-            joint_array_2[k][3] = -theta3
-            
-            
-            i = 1
-            k=k+1
-  
-    if i==0:
-        print("no answer")
-    print(joint_array[0])
-    return joint_array ,joint_array_2
-'''
 
 
 
 # Your inverse kinematics function
 # This one doesn't actually do it though...
-def inverse_kinematics(pose: Pose) -> JointState:
+def inverse_kinematics(fidTrans) -> JointState:
     global pub
+    #print(str(fidTrans))
+    print(fidTrans.transforms[0].transform.translation)
+    
+    fidTrans.transforms[0].transform.translation.x = fidTrans.transforms[0].transform.translation.x*100-2.5
+    fidTrans.transforms[0].transform.translation.y = fidTrans.transforms[0].transform.translation.y*100+22
+    fidTrans.transforms[0].transform.translation.z = 2
+    
+    
+    print(fidTrans.transforms[0].transform.translation)
     # TODO: Have fun :)
-    rospy.loginfo(f'Got desired pose\n[\n\tpos:\n{pose.position}\nrot:\n{pose.orientation}\n]')
-    pub.publish(dummy_joint_states(pose.position))
+    #rospy.loginfo(f'Got desired pose\n[\n\tpos:\n{.position}\nrot:\n{pose.orientation}\n]')
+    pub.publish(dummy_joint_states(fidTrans.transforms[0].transform.translation))
 
 
 # Funny code
 def dummy_joint_states(position) -> JointState:
     # Create message of type JointState
     msg = JointState(
-        # Set header with current time
+        # Set header with current timemy_joint_states(pose.position))
         header=Header(stamp=rospy.Time.now()),
         # Specify joint names (see `controller_config.yaml` under `dynamixel_interface/config`)
         name=['joint_1', 'joint_2', 'joint_3', 'joint_4']
@@ -228,8 +165,9 @@ def main():
 
     # Create subscriber
     sub = rospy.Subscriber(
-        'desired_pose', # Topic name
-        Pose, # Message type
+        #'desired_pose', # Topic name
+        '/fiducial_transforms',
+        FiducialTransformArray, # Message type
         inverse_kinematics # Callback function (required)
     )
 
