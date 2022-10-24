@@ -34,46 +34,46 @@ def seventh_poly_scale(t,T):
     return s
 
 
-def joint_validation(joint_ans):
-    """Validate all joint answers to select the best one to generate joint
-       trajecoy
+# def joint_validation(joint_ans):
+#     """Validate all joint answers to select the best one to generate joint
+#        trajecoy
 
-       Input: joint_ans: theta lists in array form
+#        Input: joint_ans: theta lists in array form
 
-       Implementation for now: Validate answers with angle limits then only rewrite [i] answer with [i+1] answer
-    """
-    N = np.shape(joint_ans)[0]
+#        Implementation for now: Validate answers with angle limits then only rewrite [i] answer with [i+1] answer
+#     """
+#     N = np.shape(joint_ans)[0]
 
-    valid_joint = []
+#     valid_joint = []
     
-    for joints in joint_ans:
-        joint_angle_1 = joints[0]
-        joint_angle_2 = joints[1]
-        joint_angle_3 = joints[2]
-        joint_angle_4 = joints[3]
+#     for joints in joint_ans:
+#         joint_angle_1 = joints[0]
+#         joint_angle_2 = joints[1]
+#         joint_angle_3 = joints[2]
+#         joint_angle_4 = joints[3]
         
-        if d2r(-40) <= joint_angle_1 <= d2r(40) and 0 <= joint_angle_2 <= d2r(90) and 0 <= joint_angle_3 <= d2r(150) and 0 <= joint_angle_4 <= (np.pi - joint_angle_2 - joint_angle_3):
-            valid_joint.append(joints)
-        else:
-            pass
+#         if d2r(-40) <= joint_angle_1 <= d2r(40) and 0 <= joint_angle_2 <= d2r(90) and 0 <= joint_angle_3 <= d2r(150) and 0 <= joint_angle_4 <= (np.pi - joint_angle_2 - joint_angle_3):
+#             valid_joint.append(joints)
+#         else:
+#             pass
 
-    # n = 0
+#     # n = 0
     
-    valid_ans = np.zeros((1,4))
-    for joints in valid_joint:
-        if joints != [0,0,0,0]:
-            valid_ans = joints
-        else:
-            pass
+#     valid_ans = np.zeros((1,4))
+#     for joints in valid_joint:
+#         if joints != [0,0,0,0]:
+#             valid_ans = joints
+#         else:
+#             pass
 
-    # if n == 1:
-    #     valid_ans = np.delete((re_shape,
-    #     return valid_ans
-    # elif n > 1:
-    #     valid_ans = np.zeros
+#     # if n == 1:
+#     #     valid_ans = np.delete((re_shape,
+#     #     return valid_ans
+#     # elif n > 1:
+#     #     valid_ans = np.zeros
 
-    #return first_valid
-    return valid_ans
+#     #return first_valid
+#     return valid_ans
 
 def joint_traj_gen(theta_end,T,scale):
     """Generate trajectory from valid angle answers, sample at each second
