@@ -51,7 +51,7 @@ class CameraViewer:
     except CvBridgeError as e:
       print(e)
 
-    bgr = img[corner[0], corner[1], :]
+    bgr = img[round(corner[0] - 2.5, 1), round(corner[1], 1), :]
     color = ColorRGBA()
     color.r = bgr[2]
     color.g = bgr[1]
