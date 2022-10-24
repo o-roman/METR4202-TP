@@ -5,8 +5,8 @@ import rospy
 import logging
 from std_msgs.msg import Header
 from std_msgs.msg import Float32
-from sensor_msgs.msg import JointState
 from geometry_msgs.msg import Pose
+from metr4202_tp.msg import TagPose
 from utility import *
 import numpy as np
 
@@ -18,9 +18,12 @@ import numpy as np
 
 # TODO: Check that these zones are defined correctly
 # Red bin is zone 1, green bin is zone 2, blue bin is zone 3 and yellow bin is zone 4
-bin_dict = {"red":[150, -50, 200], "green":[50, -150, 200], "blue":[-50, -150, 200], "yellow":[-150, -50, 200]}
+bin_dict = {"red":[150, -50, 100], "green":[50, -150, 100], "blue":[-50, -150, 100], "yellow":[-150, -50, 100]}
 # TODO: Make a reasonable spot that won't hit the environment, decide with team
-home_pose = Pose()
+home_pose = Pose(header=Header(stamp=rospy.Time.now()))
+home_pose.position.x = 0
+home_pose.position.y = 0
+home_pose.position.z = 0
 
 
 class StateMachineNode:
@@ -33,14 +36,13 @@ class StateMachineNode:
         self.current_state = "waiting"
         self.current_end_effector = Pose()
         self.cube_dict = {}
-
         # Defining the constants required for an opened and closed gripper
         self.gripper_close , self.gripper_open = Float32()
         self.gripper_close.data = 1500
         self.gripper_open.data = 2000
 
         # Instantiating all the required publishers and subscribers associated with this node
-        self.tag_pose_sub = rospy.Subscriber("/tag_pose", data_class=Pose, callback=self.tag_pose_callback)
+        self.tag_pose_sub = rospy.Subscriber("/tag_pose", data_class=TagPose, callback=self.tag_pose_callback)
         self.end_effector_pose_sub  = rospy.Subscriber("/end_effector_pose", data_class=Pose, callback=self.end_effector_pose_callback)
         self.desired_pose_pub = rospy.Publisher("/desired_pose", data_class=Pose, queue_size=10)
         self.gripper_pub = rospy.Publisher("/gripper", Float32, queue_size=10)
@@ -54,9 +56,9 @@ class StateMachineNode:
         logging.info("End effector pose received")
 
 
-    def tag_pose_callback(self, pose: Pose):
+    def tag_pose_callback(self, tag_pose: TagPose):
         # Add the scanned cube to the cube dictionary
-        cube = TagCube(pose)
+        cube = TagCube(tag_pose)
         self.cube_dict[cube.get_id()] = cube
         logging.info("Tag pose recieved") 
 
@@ -73,7 +75,7 @@ class StateMachineNode:
     # TODO: Decide if the +-5% is appropriate
     def end_effector_arrived(self, pose):
         
-        if(self.current_end_effector < 1.05 * pose.position) and (self.current_end_effector > 0.95 * pose.position):
+        if(self.current_end_effector < 1.1 * pose.position) and (self.current_end_effector > 0.90 * pose.position):
             return True
         else:
             return False
@@ -95,9 +97,10 @@ def main():
     state_machine = StateMachineNode()
     
     while(True):
+        t_start = rospy.get_time()
         if state_machine.state == "waiting":
             # If robot is in home position then publish the desired location to move
-            if(state_machine.current_end_effector == home_pose and t < 10):
+            if((rospy.get_time() - t_start) < 10 and state_machine.end_effector_arrived(home_pose)):
                 # This line pops the first key value pair off the dictionary which corresponds to the one with minimised distance
                 cube = state_machine.cube_dict.pop(list(state_machine.cube_dict)[0])
                 
@@ -105,7 +108,9 @@ def main():
                 desiredPoseMsg = Pose(header=Header(stamp=rospy.Time.now()))
                 
                 # Check to see this cube assignment works okay, cube should be [x y z]
-                desiredPoseMsg.position = cube.get_position()
+                desiredPoseMsg.position.x = cube.get_position()[0]
+                desiredPoseMsg.position.y = cube.get_position()[1]
+                desiredPoseMsg.position.z = cube.get_position()[2]
                 state_machine.posePub(desiredPoseMsg)
             else:
                 # If the robot is waiting but its not in its home config that means its gotten stuck somehow
@@ -117,14 +122,16 @@ def main():
                 state_machine.close_gripper()
                 #TODO: Might need a way to check if the thing got obstructed
                 state_machine.posePub(home_pose)
-                if(state_machine.current_end_effector != home_pose and t > 10)
+                if(state_machine.current_end_effector != state_machine.end_effector_arrived(home_pose) or (rospy.get_time() - t_start) > 10):
                     state_machine.current_state = "obstructed"
                 else:
                     # Form ROS msg for the desired pose
                     desiredPoseMsg = Pose(header=Header(stamp=rospy.Time.now()))
                     
                     # Check to see this cube assignment works okay, cube should be [x y z]
-                    desiredPoseMsg.position = bin_dict[cube.get_colour()]
+                    desiredPoseMsg.position.x = bin_dict[cube.get_colour()][0]
+                    desiredPoseMsg.position.y = bin_dict[cube.get_colour()][1]
+                    desiredPoseMsg.position.z = bin_dict[cube.get_colour()][2]
                     state_machine.posePub(desiredPoseMsg)
                     state_machine.current_state = "dropping"
 
@@ -132,7 +139,7 @@ def main():
                 state_machine.current_state = "obstructed"
 
         elif state_machine.state == "dropping":
-            if(state_machine.end_effector_arrived() and t < 10):
+            if((rospy.get_time() - t_start) < 10 and state_machine.end_effector_arrived(desiredPoseMsg)):
                 state_machine.open_gripper()
                 state_machine.posePub(home_pose)
                 state_machine.current_state = "waiting"
