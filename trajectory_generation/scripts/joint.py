@@ -110,17 +110,17 @@ def searching_file(x,y,z):
 def inverse_kinematics(fidTrans) -> JointState:
     global pub
     #print(str(fidTrans))
-    print(fidTrans.transforms[0].transform.translation)
+    #print(fidTrans.transforms[0].transform.translation)
     
-    fidTrans.transforms[0].transform.translation.x = fidTrans.transforms[0].transform.translation.x*100-2.5
-    fidTrans.transforms[0].transform.translation.y = fidTrans.transforms[0].transform.translation.y*100+22
+    fidTrans.transforms[0].transform.translation.x = fidTrans.transforms[0].transform.translation.x*100
+    fidTrans.transforms[0].transform.translation.y = fidTrans.transforms[0].transform.translation.y*100+22.8
     fidTrans.transforms[0].transform.translation.z = 2
     
     
-    print(fidTrans.transforms[0].transform.translation)
+    #print(fidTrans.transforms[0].transform.translation)
     # TODO: Have fun :)
     #rospy.loginfo(f'Got desired pose\n[\n\tpos:\n{.position}\nrot:\n{pose.orientation}\n]')
-    pub.publish(dummy_joint_states(fidTrans.transforms[0].transform.translation))
+    dummy_joint_states(fidTrans.transforms[0].transform.translation)
 
 
 # Funny code
@@ -134,6 +134,7 @@ def dummy_joint_states(position) -> JointState:
     )
 
     joint_array = searching_file(position.x,position.y,position.z)
+
     
     # Funny code   
     msg.position = [
@@ -143,6 +144,7 @@ def dummy_joint_states(position) -> JointState:
         -joint_array[3]
 
     ]
+    pub.publish(msg)
     # Funny code
     
     '''msg.position = [
@@ -151,7 +153,7 @@ def dummy_joint_states(position) -> JointState:
         random.uniform(-1.5, 1.5),
         random.uniform(-1.5, 1.5)
     ]'''
-    return msg
+    
 
 
 def main():
@@ -162,7 +164,7 @@ def main():
         JointState, # Message type
         queue_size=10 # Topic size (optional)
     )
-
+    
     # Create subscriber
     sub = rospy.Subscriber(
         #'desired_pose', # Topic name
@@ -172,7 +174,7 @@ def main():
     )
 
     # Initialise node with any node name
-    rospy.init_node('metr4202_w7_prac')
+    rospy.init_node('inversekinematic')
 
     # You spin me right round baby, right round...
     # Just stops Python from exiting and executes callbacks

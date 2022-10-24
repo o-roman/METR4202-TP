@@ -2,10 +2,14 @@
 from re import T
 import numpy as np
 import rospy
-import logging
-from sensor_msgs.msg import *
-from geometry_msgs.msg import *
-from std_msgs import *
+# import logging
+from sensor_msgs.msg import JointState
+from geometry_msgs.msg import Pose
+from std_msgs.msg import *
+
+import sys
+sys.path.insert(1, '/home/metr4202/catkin_ws/src/metr4202_tp/inverse_kinematics/msg')
+import JointStateArray.msg 
 
 def IKinSpace(x,y,z):
     L1 = 100
@@ -57,22 +61,34 @@ def IKinSpace(x,y,z):
        
     return thetalist
 
-class InverseKinematicsNode:
+
+
+class InverseKinematicsNode(object):
     def __init__(self):
-        rospy.init_node('IK_node')
+        rospy.init_node('inverse_kinematics_node')
         self.desired_pose_sub = rospy.Subscriber('/desired_pose', data_class=Pose, callback=self.desired_pose_callback)
         self.raw_theta_end_pub = rospy.Publisher('/raw_theta_end',data_class=JointStateArray, queue_size = 10)
-
+        
     def desired_pose_callback(self, msg:Pose):
-        desired_pose_sub = msg.position
-        logging.info('Desired pose received')
-        pring(desired_pose_sub[0], desired_pose_sub[1], desired_pose_sub[2])
+        # raw_theta_end_msg = JointState()
+        raw_theta_end_msg = JointState(header = Header(), name=["joint_0","joint_1","joint_2","joint_3"], position=IKinSpace(msg.position.x, msg.position.y, msg.position.z),velocity=[],effort=[])
+        # raw_theta_end_msg = IKinSpace(msg.position.x, msg.position.y, msg.position.z)
+        # print(msg.position.x, msg.position.y, msg.position.z)
+        # print(raw_theta_end_msg)
 
+        # N = len(raw_theta_end_msg.position)
 
-def main():
-    ik_node = InverseKinematicsNode()
-    IKinSpace(ik_node[0], ik_node[1], ik_node[2])
+        # for i in range(N):
+        # raw_theta_end_msg = JointState(header = Header(), name=["joint_0","joint_1","joint_2","joint_3"], position=raw_theta_end_msg[i],velocity=[],effort=[])
+        self.raw_theta_end_pub.publish(raw_theta_end_msg)
 
+    def run(self):
+        rospy.sleep(2)
+        rospy.spin()
 
 if __name__ == "__main__":
-    main()
+    try:
+        ik_node = InverseKinematicsNode()
+        ik_node.run()
+    except rospy.ROSInterruptException as e:
+        pass
