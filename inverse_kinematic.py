@@ -70,17 +70,14 @@ def sample():
     plt.title('www.ai8py.com')
     plt.show()
     return mat
-def invers_two( ):
-    mat = sample()
-    joint_mat = np.zeros(shape=(1793,7))
-    num = 0
-    for i in range(1793):
-        flag = 0
-
+def invers_two( x,y,zinit):
         l0 = 10
-        x = mat[i][0]
-        y = mat[i][1]
-        z = mat[i][2]-l0
+        z = zinit -l0
+
+
+
+
+
 
         l1 = 11.75
         l2 = 9.5
@@ -92,12 +89,10 @@ def invers_two( ):
         b = z
         for j1 in range(0, 90):
             j1_pi = j1 * (np.pi / 180)
-            if flag == 1:
-                break
+
             for j2 in range(0,150):
                 j2_pi = j2 * (np.pi / 180)
-                if flag == 1:
-                    break
+
                 for j3 in range(0,90):
                     j3_pi = j3 *(np.pi/180)
 
@@ -115,34 +110,20 @@ def invers_two( ):
                        continue
                        '''''
                     if x1 < (x +0.1) and x1 > (x -0.1 ) and y1 < (y + 0.1) and y1 > (y - 0.1) and z1 < (z + 0.1) and z1 > (z - 0.1):
-                        joint_mat[i][0] = theta0
-                        joint_mat[i][1] = theta1
-                        joint_mat[i][2] = theta2
-                        joint_mat[i][3] = theta3
-                        joint_mat[i][4] = mat[i][0]
-                        joint_mat[i][5] = mat[i][1]
-                        joint_mat[i][6] = mat[i][2]
-                        print(joint_mat[i])
-                        raw = [x1,y1,z1+l0]
-                        print(raw)
-                        num = num+1
-                        print(num)
-                        '''''
-                        print("joint0:", theta0)
-                        print("joint1:", theta1)
-                        print("joint2:", theta2)
-                        print("joint3:", theta3)
+                        print("theta0: ",theta0)
+                        print("theta1: ",theta1)
+                        print("theta2: ",theta2)
+                        print("theta3: ", theta3)
                         print("joint0:", theta0 * (180 / np.pi))
                         print("joint1:", theta1 * (180 / np.pi))
                         print("joint2:", theta2 * (180 / np.pi))
                         print("joint3:", theta3 * (180 / np.pi))
-                        print(x1, y1, z1 + l0)
-                        print()
-                        '''
-                        flag =1
-                        if flag ==1:
-                            break
-    np.savetxt(r'test3.txt', joint_mat, fmt='%s', delimiter=',')
+                        print(x1)
+                        print(y1)
+                        print(z1+l0)
+
+
+
 
 
 def invers(x,y,z_init):
@@ -188,6 +169,7 @@ def invers(x,y,z_init):
             print("joint1:", theta1* (180 / np.pi))
             print("joint2:", theta2* (180 / np.pi))
             print("joint3:", theta3* (180 / np.pi))
+
             print(x1, y1, z1+l0)
             print()
             i = 1
@@ -299,8 +281,8 @@ def searching_file(x,y,z):
 
 
 if __name__ == '__main__':
-    searching_file(0.6789,10.22335454,1.5677)
-    #invers_two()
+   # searching_file(0.6789,10.22335454,1.5677)
+    invers_two(-5,-13,5)
     #invers(10,7,9)
     #invers_two(0,2.8,1)
 
