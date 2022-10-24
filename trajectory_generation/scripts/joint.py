@@ -120,7 +120,7 @@ def inverse_kinematics(fidTrans) -> JointState:
     #print(fidTrans.transforms[0].transform.translation)
     # TODO: Have fun :)
     #rospy.loginfo(f'Got desired pose\n[\n\tpos:\n{.position}\nrot:\n{pose.orientation}\n]')
-    pub.publish(dummy_joint_states(fidTrans.transforms[0].transform.translation))
+    dummy_joint_states(fidTrans.transforms[0].transform.translation)
 
 
 # Funny code
@@ -134,6 +134,7 @@ def dummy_joint_states(position) -> JointState:
     )
 
     joint_array = searching_file(position.x,position.y,position.z)
+
     
     # Funny code   
     msg.position = [
@@ -143,6 +144,7 @@ def dummy_joint_states(position) -> JointState:
         -joint_array[3]
 
     ]
+    pub.publish(msg)
     # Funny code
     
     '''msg.position = [
@@ -151,7 +153,7 @@ def dummy_joint_states(position) -> JointState:
         random.uniform(-1.5, 1.5),
         random.uniform(-1.5, 1.5)
     ]'''
-    return msg
+    
 
 
 def main():
