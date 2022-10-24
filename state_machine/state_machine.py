@@ -134,7 +134,6 @@ def main():
                     desiredPoseMsg.position.z = bin_dict[cube.get_colour()][2]
                     state_machine.posePub(desiredPoseMsg)
                     state_machine.current_state = "dropping"
-
             else:
                 state_machine.current_state = "obstructed"
 
