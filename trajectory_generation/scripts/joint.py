@@ -22,10 +22,10 @@ import numpy as np
 
 
 def read_file():
-    fname = '/home/metr4202-team16/catkin_ws/src/metr4202_w7_prac/scripts/test2.txt'
+    fname = '/home/metr4202-team16/catkin_ws/src/metr4202_tp/test2.txt'
     with open(fname, 'r+', encoding='utf-8') as f:
         s = [i[:-1].split(',') for i in f.readlines()]
-    transer_data = np.zeros(shape=(1701, 7))
+    transer_data = np.zeros(shape=(1705, 7))
 
     for i in range(len(transer_data)):
         for j in range(7):
@@ -34,7 +34,7 @@ def read_file():
         transer_data[i][0] = transer_data[i][0]-1.507       
     return transer_data 
 def read_file_2():
-    fname = '/home/metr4202-team16/catkin_ws/src/metr4202_w7_prac/scripts/test.txt'
+    fname = '/home/metr4202-team16/catkin_ws/src/metr4202_tp/test.txt'
     with open(fname, 'r+', encoding='utf-8') as f:
         s = [i[:-1].split(',') for i in f.readlines()]
     transer_data = np.zeros(shape=(1793, 7))
@@ -120,7 +120,7 @@ def inverse_kinematics(fidTrans) -> JointState:
     #print(fidTrans.transforms[0].transform.translation)
     # TODO: Have fun :)
     #rospy.loginfo(f'Got desired pose\n[\n\tpos:\n{.position}\nrot:\n{pose.orientation}\n]')
-    dummy_joint_states(fidTrans.transforms[0].transform.translation)
+    pub.publish(dummy_joint_states(fidTrans.transforms[0].transform.translation))
 
 
 # Funny code
@@ -144,7 +144,7 @@ def dummy_joint_states(position) -> JointState:
         -joint_array[3]
 
     ]
-    pub.publish(msg)
+    #pub.publish(msg)
     # Funny code
     
     '''msg.position = [
@@ -153,7 +153,7 @@ def dummy_joint_states(position) -> JointState:
         random.uniform(-1.5, 1.5),
         random.uniform(-1.5, 1.5)
     ]'''
-    
+    return msg
 
 
 def main():
@@ -174,7 +174,7 @@ def main():
     )
 
     # Initialise node with any node name
-    rospy.init_node('inversekinematic')
+    rospy.init_node('metr4202_w7_prac')
 
     # You spin me right round baby, right round...
     # Just stops Python from exiting and executes callbacks

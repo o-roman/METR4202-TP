@@ -6,7 +6,7 @@ import logging
 from sensor_msgs.msg import JointState
 from geometry_msgs.msg import *
 from std_msgs import *
-
+from std_msgs.msg import Header
 def d2r(deg):
     """Simply change degree angle to radius angle
     """
@@ -242,22 +242,21 @@ def joint_traj_gen(theta_end,T,scale):
 
 def raw_theta_end_callback(msg:JointState):
         
-        array = np.zeros(shape=(100,4))
-        for i in range(100):
-            array[i] = msg.position
+        # array = np.zeros(shape=(100,4))
+        # for i in range(100):
+        #     array[i] = msg.position
              
-        a = joint_traj_gen(joint_validation(array),5,7)
-        print(a)        
-            
+        a = joint_traj_gen(msg.position,5,7)
+        print(a)
 
 def main():
     global pub
     global i
     i=0
     rospy.init_node('trajectory_gen_node')
-    traj_theta_end_pub = rospy.Publisher('/desired_joint_states', JointState, queue_size = 10)
+    traj_theta_end_pub = rospy.Publisher('new', JointState, queue_size = 10)
 
-    raw_theta_end_sub = rospy.Subscriber('/raw_theta_end', JointState, raw_theta_end_callback)
+    raw_theta_end_sub = rospy.Subscriber('/desired_joint_states', JointState, raw_theta_end_callback)
     rate = rospy.Rate(10)
     rospy.spin()
     # traj_d2h = back2home_traj_gen(joint_validation(theta_end),5,7)
